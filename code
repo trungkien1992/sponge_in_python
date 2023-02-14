@@ -1,0 +1,21 @@
+def pad(M,r,l):
+    padding = '0'*(l-(len(M)- len(r))%l)
+    padded_data = M + r + padding
+    return padded_data
+
+def f(input_string):
+    permuted_string = "".join(random.sample(input_string, len(input_string)))
+    return permuted_string
+
+def sponge (M, l, r, f):
+    P = pad(M,r,l)
+    s = '0'* len(r)
+    Z = ""
+    for i in range (0,(len(P)//len(r))-1):
+        si = int(s, 2) ^ int(P[i * len(r) : (i + 1) * len(r)], 2)
+        s = format(si, '0{}b'.format(len(r)))
+        s = f(s)
+    while len(Z) < l:
+        s = f(s)
+        Z += format(int(s, 2), '0{}b'.format(len(r)))
+    return Z[:l]
