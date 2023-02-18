@@ -1,21 +1,43 @@
-def pad(M,r,l):
-    padding = '0'*(l-(len(M)- len(r))%l)
-    padded_data = M + r + padding
+import math
+import random
+
+B = 16
+r = math.ceil(math.log2(B))  # round up the value of r
+c = B - r
+
+def pad(M, r, l):
+    padding = '0' * ((l - (len(M) + r)) % l)
+    padded_data = M + '1' + padding
     return padded_data
 
 def f(input_string):
     permuted_string = "".join(random.sample(input_string, len(input_string)))
     return permuted_string
 
-def sponge (M, l, r, f):
-    P = pad(M,r,l)
-    s = '0'* len(r)
+def sponge(B, r, c, M, l, f, pad):
+    P = pad(M, r, l)
     Z = ""
-    for i in range (0,(len(P)//len(r))-1):
-        si = int(s, 2) ^ int(P[i * len(r) : (i + 1) * len(r)], 2)
-        s = format(si, '0{}b'.format(len(r)))
-        s = f(s)
+    s = '0' * r
+    c = '0' * c
+
+    # absorbing phase
+    for i in range(0, (B // r) - 1):
+        si = int(s, 2) ^ int(P[i * r: (i + 1) * r], 2)
+        s = f(bin(si)[2:] + c)
+        z = s[:r]
+        Z += z
+
+    # squeezing phase
     while len(Z) < l:
         s = f(s)
-        Z += format(int(s, 2), '0{}b'.format(len(r)))
+        z = s[:r]
+        Z += z
+
     return Z[:l]
+
+# input examples
+B = 16
+M = '111'
+l = 20
+
+print(sponge(B, r, c, M, l, f, pad))
