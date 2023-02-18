@@ -1,9 +1,9 @@
 import math
 import random
 
-B = 16
+B = 16 #block size
 r = math.ceil(math.log2(B))  # round up the value of r
-c = B - r
+c = B - r #capacity
 
 def pad(M, r, l):
     padding = '0' * ((l - (len(M) + r)) % l)
